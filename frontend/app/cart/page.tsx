@@ -102,7 +102,20 @@ export default function CartPage() {
   }
 
   const handleCheckout = () => {
-    if (cartItems.length === 0) return
+    console.log("=== CHECKOUT DEBUG ===")
+    console.log("Checkout button clicked")
+    console.log("Cart items:", cartItems)
+    console.log("Cart length:", cartItems.length)
+    console.log("LocalStorage cart:", localStorage.getItem("cart"))
+    
+    if (cartItems.length === 0) {
+      console.log("Cart is empty, not proceeding")
+      alert("Your cart is empty! Please add items before checkout.")
+      return
+    }
+    
+    console.log("Proceeding to checkout...")
+    console.log("=== END DEBUG ===")
     router.push("/checkout")
   }
 

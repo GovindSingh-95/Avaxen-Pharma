@@ -308,7 +308,7 @@ export default function HomePage() {
                   </CardContent>
                 </Card>
               ))
-            ) : featuredMedicines.length > 0 ? (
+            ) : featuredMedicines && featuredMedicines.length > 0 ? (
               featuredMedicines.map((medicine) => (
                 <Card key={medicine._id} className="hover:shadow-lg transition-shadow border-0 bg-white">
                   <CardContent className="p-4">

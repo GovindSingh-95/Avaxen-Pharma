@@ -1,4 +1,10 @@
 // Payment Gateway Integration (Razorpay for Indian market)
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
+}
+
 export interface PaymentDetails {
   amount: number
   currency: string
@@ -16,45 +22,128 @@ export interface PaymentResult {
   error?: string
 }
 
+// Load Razorpay script
+const loadRazorpayScript = (): Promise<boolean> => {
+  return new Promise((resolve) => {
+    // Check if already loaded
+    if (window.Razorpay) {
+      resolve(true)
+      return
+    }
+
+    const script = document.createElement('script')
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js'
+    script.onload = () => resolve(true)
+    script.onerror = () => resolve(false)
+    document.body.appendChild(script)
+  })
+}
+
 // Razorpay integration for Indian market
 export class RazorpayGateway {
   private keyId: string
-  private keySecret: string
 
   constructor() {
-    // In production, these would come from environment variables
-    this.keyId = process.env.RAZORPAY_KEY_ID || "rzp_test_demo"
-    this.keySecret = process.env.RAZORPAY_KEY_SECRET || "demo_secret"
+    // Use demo key for testing - replace with your actual key
+    this.keyId = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_test_9WdUFUmBhJWZX6"
+    console.log("Payment gateway initialized with key:", this.keyId.slice(0, 10) + "...")
   }
 
   async createOrder(amount: number, currency = "INR"): Promise<string> {
-    // Simulate order creation
-    const orderId = `order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-    return orderId
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/orders/payment/create-order`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          amount: amount * 100, // Convert to paisa
+          currency
+        })
+      })
+
+      const data = await response.json()
+      
+      if (data.success) {
+        return data.orderId
+      } else {
+        throw new Error(data.message || 'Failed to create order')
+      }
+    } catch (error) {
+      console.error('Order creation error:', error)
+      // Fallback to demo order ID
+      return `order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    }
   }
 
   async processPayment(details: PaymentDetails): Promise<PaymentResult> {
-    // Simulate payment processing
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        // Simulate 95% success rate
-        const success = Math.random() > 0.05
+    try {
+      // Load Razorpay script
+      const scriptLoaded = await loadRazorpayScript()
+      
+      if (!scriptLoaded) {
+        return {
+          success: false,
+          error: "Payment gateway failed to load. Please try again."
+        }
+      }
 
-        if (success) {
-          resolve({
-            success: true,
-            paymentId: `pay_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-            orderId: details.orderId,
-            signature: `sig_${Math.random().toString(36).substr(2, 16)}`,
-          })
-        } else {
+      return new Promise((resolve) => {
+        const options = {
+          key: this.keyId,
+          amount: details.amount * 100, // Convert to paisa
+          currency: details.currency,
+          name: "Avaxen Pharma",
+          description: "Medicine Order Payment",
+          image: "/placeholder-logo.png",
+          order_id: details.orderId,
+          handler: function (response: any) {
+            resolve({
+              success: true,
+              paymentId: response.razorpay_payment_id,
+              orderId: response.razorpay_order_id,
+              signature: response.razorpay_signature
+            })
+          },
+          prefill: {
+            name: details.customerName,
+            email: details.customerEmail,
+            contact: details.customerPhone
+          },
+          notes: {
+            address: "Avaxen Pharma Order"
+          },
+          theme: {
+            color: "#2563eb"
+          },
+          modal: {
+            ondismiss: function() {
+              resolve({
+                success: false,
+                error: "Payment cancelled by user"
+              })
+            }
+          }
+        }
+
+        const rzp = new window.Razorpay(options)
+        
+        rzp.on('payment.failed', function (response: any) {
           resolve({
             success: false,
-            error: "Payment failed. Please try again.",
+            error: response.error.description || "Payment failed"
           })
-        }
-      }, 2000) // Simulate network delay
-    })
+        })
+
+        rzp.open()
+      })
+    } catch (error) {
+      console.error('Payment processing error:', error)
+      return {
+        success: false,
+        error: "Payment processing failed. Please try again."
+      }
+    }
   }
 }
 

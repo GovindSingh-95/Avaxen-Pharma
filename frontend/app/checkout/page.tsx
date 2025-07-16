@@ -43,45 +43,89 @@ export default function CheckoutPage() {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("razorpay")
   const [isProcessing, setIsProcessing] = useState(false)
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
+  const [isLoadingCart, setIsLoadingCart] = useState(true)
 
   const router = useRouter()
 
   // Load cart from localStorage
   useEffect(() => {
-    const savedCart = localStorage.getItem("cart")
-    if (savedCart) {
-      const cartIds = JSON.parse(savedCart) as number[]
-      const items: CartItem[] = []
+    const loadCart = () => {
+      try {
+        const savedCart = localStorage.getItem("cart")
+        console.log("Saved cart from localStorage:", savedCart)
+        
+        if (savedCart && savedCart !== "[]") {
+          const cartIds = JSON.parse(savedCart) as number[]
+          console.log("Cart IDs:", cartIds)
+          
+          if (cartIds.length > 0) {
+            const items: CartItem[] = []
 
-      // Count quantities and get medicine details
-      const itemCounts: { [key: number]: number } = {}
-      cartIds.forEach((id) => {
-        itemCounts[id] = (itemCounts[id] || 0) + 1
-      })
+            // Count quantities and get medicine details
+            const itemCounts: { [key: number]: number } = {}
+            cartIds.forEach((id) => {
+              itemCounts[id] = (itemCounts[id] || 0) + 1
+            })
 
-      Object.entries(itemCounts).forEach(([id, quantity]) => {
-        const medicine = getMedicineById(Number(id))
-        if (medicine) {
-          items.push({ ...medicine, quantity })
+            Object.entries(itemCounts).forEach(([id, quantity]) => {
+              const medicine = getMedicineById(Number(id))
+              console.log(`Looking for medicine with ID ${id}:`, medicine)
+              if (medicine) {
+                items.push({ ...medicine, quantity })
+              } else {
+                console.warn(`Medicine with ID ${id} not found`)
+              }
+            })
+
+            console.log("Loaded cart items:", items)
+            setCartItems(items)
+          }
         }
-      })
-
-      setCartItems(items)
+      } catch (error) {
+        console.error("Error loading cart:", error)
+      }
+      
+      // Always set loading to false after attempting to load
+      setTimeout(() => {
+        setIsLoadingCart(false)
+        console.log("Loading state set to false")
+      }, 200) // Slightly longer delay to ensure state updates
     }
 
-    // Load saved customer details
+    // Load cart immediately and also load customer details
+    loadCart()
+
     const savedDetails = localStorage.getItem("customerDetails")
     if (savedDetails) {
-      setCustomerDetails(JSON.parse(savedDetails))
+      try {
+        setCustomerDetails(JSON.parse(savedDetails))
+      } catch (error) {
+        console.error("Error loading customer details:", error)
+      }
     }
   }, [])
 
-  // Redirect if cart is empty
+  // Redirect if cart is empty (only after loading is complete and a delay)
   useEffect(() => {
-    if (cartItems.length === 0) {
-      router.push("/cart")
+    if (!isLoadingCart) {
+      console.log("Loading complete. Cart items length:", cartItems.length)
+      console.log("Cart items:", cartItems)
+      
+      if (cartItems.length === 0) {
+        console.log("Cart is empty after loading, waiting before redirect...")
+        // Wait a bit more to ensure all state updates are complete
+        const timer = setTimeout(() => {
+          console.log("Final check - cart items length:", cartItems.length)
+          if (cartItems.length === 0) {
+            console.log("Cart still empty, redirecting to cart page")
+            router.push("/cart")
+          }
+        }, 500) // 500ms delay
+        
+        return () => clearTimeout(timer)
+      }
     }
-  }, [cartItems, router])
+  }, [cartItems, router, isLoadingCart])
 
   const validateForm = (): boolean => {
     const newErrors: { [key: string]: string } = {}
@@ -126,6 +170,7 @@ export default function CheckoutPage() {
 
   const handlePlaceOrder = async () => {
     if (!validateForm()) {
+      alert("Please fill in all required fields correctly.")
       return
     }
 
@@ -139,19 +184,20 @@ export default function CheckoutPage() {
       const deliveryFee = subtotal > 500 ? 0 : 50
       const total = subtotal + deliveryFee
 
-      // Create order
-      const orderId = await razorpayGateway.createOrder(total)
+      console.log("Starting order process with total:", total)
 
       // Process payment based on selected method
       if (selectedPaymentMethod === "cod") {
         // Cash on Delivery - Skip payment processing
+        console.log("Processing COD order...")
+        
         setTimeout(() => {
           // Clear cart and redirect
           localStorage.removeItem("cart")
           localStorage.setItem(
             "lastOrder",
             JSON.stringify({
-              orderId,
+              orderId: `COD_${Date.now()}`,
               items: cartItems,
               total,
               paymentMethod: "Cash on Delivery",
@@ -163,35 +209,48 @@ export default function CheckoutPage() {
         }, 1000)
       } else {
         // Online payment
-        const paymentDetails: PaymentDetails = {
-          amount: total,
-          currency: "INR",
-          orderId,
-          customerName: customerDetails.name,
-          customerEmail: customerDetails.email,
-          customerPhone: customerDetails.phone,
-        }
+        console.log("Processing online payment...")
+        
+        try {
+          // Create order
+          const orderId = await razorpayGateway.createOrder(total)
+          console.log("Order created with ID:", orderId)
 
-        const result = await razorpayGateway.processPayment(paymentDetails)
+          const paymentDetails: PaymentDetails = {
+            amount: total,
+            currency: "INR",
+            orderId,
+            customerName: customerDetails.name,
+            customerEmail: customerDetails.email,
+            customerPhone: customerDetails.phone,
+          }
 
-        if (result.success) {
-          // Clear cart and redirect
-          localStorage.removeItem("cart")
-          localStorage.setItem(
-            "lastOrder",
-            JSON.stringify({
-              orderId,
-              paymentId: result.paymentId,
-              items: cartItems,
-              total,
-              paymentMethod: paymentMethods.find((m) => m.id === selectedPaymentMethod)?.name,
-              customerDetails,
-              orderDate: new Date().toISOString(),
-            }),
-          )
-          router.push("/order-success")
-        } else {
-          alert(result.error || "Payment failed. Please try again.")
+          console.log("Starting payment with details:", paymentDetails)
+          const result = await razorpayGateway.processPayment(paymentDetails)
+          console.log("Payment result:", result)
+
+          if (result.success) {
+            // Clear cart and redirect
+            localStorage.removeItem("cart")
+            localStorage.setItem(
+              "lastOrder",
+              JSON.stringify({
+                orderId,
+                paymentId: result.paymentId,
+                items: cartItems,
+                total,
+                paymentMethod: paymentMethods.find((m) => m.id === selectedPaymentMethod)?.name,
+                customerDetails,
+                orderDate: new Date().toISOString(),
+              }),
+            )
+            router.push("/order-success")
+          } else {
+            alert(result.error || "Payment failed. Please try again.")
+          }
+        } catch (paymentError) {
+          console.error("Payment processing error:", paymentError)
+          alert("Payment gateway error. Please try again or select Cash on Delivery.")
         }
       }
     } catch (error) {
@@ -206,8 +265,33 @@ export default function CheckoutPage() {
   const deliveryFee = subtotal > 500 ? 0 : 50
   const total = subtotal + deliveryFee
 
-  if (cartItems.length === 0) {
-    return <div>Loading...</div>
+  // Show loading state while cart is being loaded
+  if (isLoadingCart) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading checkout...</p>
+          <p className="text-xs text-gray-500 mt-2">
+            Cart data: {typeof window !== 'undefined' ? localStorage.getItem("cart") : 'loading...'}
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  // Show empty cart message if no items after loading
+  if (!isLoadingCart && cartItems.length === 0) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-600 mb-4">Your cart is empty</p>
+          <Button asChild>
+            <Link href="/cart">Go to Cart</Link>
+          </Button>
+        </div>
+      </div>
+    )
   }
 
   return (
