@@ -350,28 +350,15 @@ export default function TrackOrderPage() {
                     deliveryLocation={orderData.deliveryLocation}
                     currentLocation={orderData.currentLocation}
                     deliveryStatus={orderData.status}
+                    deliveryAgent={orderData.deliveryAgent}
+                    estimatedTime={orderData.estimatedDelivery}
+                    onCallAgent={() => {
+                      if (orderData.deliveryAgent?.phone) {
+                        window.open(`tel:${orderData.deliveryAgent.phone}`, '_self');
+                      }
+                    }}
                   />
                 )}
-                <div className="grid grid-cols-3 gap-4 mt-4 text-sm">
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
-                      <span className="text-xs text-white">🏥</span>
-                    </div>
-                    <span>Pharmacy</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
-                      <span className="text-xs text-white">🚚</span>
-                    </div>
-                    <span>Delivery Agent</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
-                      <span className="text-xs text-white">🏠</span>
-                    </div>
-                    <span>Your Location</span>
-                  </div>
-                </div>
               </CardContent>
             </Card>
 
