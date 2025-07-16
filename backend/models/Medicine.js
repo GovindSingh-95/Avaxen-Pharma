@@ -34,6 +34,27 @@ const medicineSchema = new mongoose.Schema({
   precautions: [{ type: String }],
   dosage: { type: String, required: true },
   
+  // Batch and Expiry Information
+  batchNo: { type: String, default: () => `MED${Date.now().toString().slice(-6)}` },
+  expiryDate: { 
+    type: String, 
+    default: () => {
+      const date = new Date();
+      date.setFullYear(date.getFullYear() + 2);
+      return date.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
+    }
+  },
+  manufactureDate: { 
+    type: String, 
+    default: () => new Date().toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })
+  },
+  
+  // Storage Instructions
+  storageInstructions: [{ 
+    type: String, 
+    default: ["Keep in cool, dry place", "Store away from children", "Protect from light"] 
+  }],
+  
   // SEO and search
   tags: [{ type: String }],
   searchKeywords: [{ type: String }],

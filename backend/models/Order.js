@@ -75,6 +75,40 @@ const orderSchema = new mongoose.Schema({
   estimatedDelivery: Date,
   deliveredAt: Date,
   
+  // Delivery Agent Information
+  deliveryAgent: {
+    name: String,
+    phone: String,
+    vehicle: String,
+    assignedAt: Date
+  },
+  
+  // Pharmacy Information
+  pharmacyDetails: {
+    name: { type: String, default: "HealthCare Pharmacy" },
+    license: String,
+    pharmacist: String,
+    address: String,
+    phone: String
+  },
+  
+  // Location Tracking
+  pharmacyLocation: {
+    lat: Number,
+    lng: Number,
+    address: String
+  },
+  deliveryLocation: {
+    lat: Number,
+    lng: Number,
+    address: String
+  },
+  currentLocation: {
+    lat: Number,
+    lng: Number,
+    lastUpdated: { type: Date, default: Date.now }
+  },
+  
   // Tracking
   trackingUpdates: [{
     status: String,

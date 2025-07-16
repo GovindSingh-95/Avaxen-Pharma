@@ -52,6 +52,40 @@ export interface Order {
   prescriptionVerified: boolean;
   estimatedDelivery?: string;
   deliveredAt?: string;
+  
+  // Delivery Agent Information
+  deliveryAgent?: {
+    name: string;
+    phone: string;
+    vehicle: string;
+    assignedAt?: string;
+  };
+  
+  // Pharmacy Information
+  pharmacyDetails?: {
+    name: string;
+    license: string;
+    pharmacist: string;
+    address?: string;
+    phone?: string;
+  };
+  
+  // Location Tracking
+  pharmacyLocation?: {
+    lat: number;
+    lng: number;
+    address: string;
+  };
+  deliveryLocation?: {
+    lat: number;
+    lng: number;
+    address: string;
+  };
+  currentLocation?: {
+    lat: number;
+    lng: number;
+    lastUpdated?: string;
+  };
   trackingUpdates: {
     status: string;
     message: string;

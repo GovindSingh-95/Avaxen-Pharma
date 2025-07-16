@@ -23,6 +23,15 @@ export interface Medicine {
   sideEffects: string[];
   precautions: string[];
   dosage: string;
+  
+  // Batch and Expiry Information
+  batchNo?: string;
+  expiryDate?: string;
+  manufactureDate?: string;
+  storageInstructions?: string[];
+  
+  // Alternative name for prescription field to match backend
+  prescriptionRequired?: boolean;
   featured?: boolean;
   createdAt: string;
   updatedAt: string;

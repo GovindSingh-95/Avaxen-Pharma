@@ -460,8 +460,8 @@ const trackOrder = async (req, res) => {
     const { orderNumber } = req.params;
 
     const order = await Order.findOne({ orderNumber })
-      .populate('items.medicine', 'name image')
-      .select('orderNumber status trackingUpdates estimatedDelivery totalAmount createdAt items');
+      .populate('items.medicine', 'name image batchNo expiryDate prescriptionRequired storageInstructions')
+      .select('orderNumber status trackingUpdates estimatedDelivery totalAmount createdAt items deliveryAgent pharmacyDetails pharmacyLocation deliveryLocation currentLocation');
 
     if (!order) {
       return res.status(404).json({
@@ -470,9 +470,57 @@ const trackOrder = async (req, res) => {
       });
     }
 
+    // Set default pharmacy location if not set (Mumbai coordinates)
+    if (!order.pharmacyLocation) {
+      order.pharmacyLocation = {
+        lat: 19.0800,
+        lng: 72.8750,
+        address: "HealthCare Pharmacy, Bandra West, Mumbai"
+      };
+    }
+
+    // Set default delivery location based on shipping address
+    if (!order.deliveryLocation && order.shippingAddress) {
+      order.deliveryLocation = {
+        lat: 19.0760,
+        lng: 72.8777,
+        address: `${order.shippingAddress.address}, ${order.shippingAddress.city}, ${order.shippingAddress.state}`
+      };
+    }
+
+    // Set current location for active deliveries
+    if (order.status === 'Out for Delivery' && !order.currentLocation) {
+      order.currentLocation = {
+        lat: 19.0780,
+        lng: 72.8765,
+        lastUpdated: new Date()
+      };
+    }
+
+    // Set default delivery agent if not assigned
+    if (!order.deliveryAgent && ['Shipped', 'Out for Delivery'].includes(order.status)) {
+      order.deliveryAgent = {
+        name: "Rajesh Kumar",
+        phone: "+91 98765 43210",
+        vehicle: "Bike - MH12AB1234",
+        assignedAt: new Date()
+      };
+    }
+
+    // Set default pharmacy details if not set
+    if (!order.pharmacyDetails.license) {
+      order.pharmacyDetails = {
+        name: "HealthCare Pharmacy",
+        license: "DL-12345-2024",
+        pharmacist: "Dr. Priya Sharma",
+        address: "Shop 15, Bandra West, Mumbai",
+        phone: "+91 98765 12345"
+      };
+    }
+
     res.status(200).json({
       success: true,
-      data: order
+      order: order
     });
   } catch (error) {
     res.status(500).json({

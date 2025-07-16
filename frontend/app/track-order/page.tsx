@@ -52,9 +52,26 @@ export default function TrackOrderPage() {
           orderNumber: response.order.orderNumber,
           status: response.order.status,
           estimatedDelivery: response.order.estimatedDelivery,
-          items: response.order.items,
+          deliveryPartner: "Avaxen Express",
+          deliveryAgent: response.order.deliveryAgent,
+          pharmacyDetails: response.order.pharmacyDetails,
+          pharmacyLocation: response.order.pharmacyLocation,
+          deliveryLocation: response.order.deliveryLocation,
+          currentLocation: response.order.currentLocation,
+          items: response.order.items.map((item: any) => ({
+            name: item.medicine.name,
+            quantity: item.quantity,
+            price: item.price,
+            prescriptionRequired: item.medicine.prescriptionRequired,
+            batchNo: item.medicine.batchNo,
+            expiryDate: item.medicine.expiryDate
+          })),
           total: response.order.totalAmount,
-          timeline: response.order.trackingUpdates || []
+          timeline: response.order.trackingUpdates || [],
+          specialInstructions: response.order.items[0]?.medicine?.storageInstructions || [
+            "Keep medicines in cool, dry place",
+            "Store away from children"
+          ]
         })
       } else {
         setOrderData(null)
