@@ -5,10 +5,27 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { CheckCircle, Package, Truck, MapPin, ArrowLeft, Search, Phone, Clock, Shield } from "lucide-react"
+import { CheckCircle, Package, Truck, MapPin, ArrowLeft, Search, Phone, Clock, Shield, Navigation } from "lucide-react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import { orderApi } from "@/lib/api"
+import dynamic from "next/dynamic"
+
+// Dynamically import the map component to avoid SSR issues
+const DeliveryMap = dynamic(
+  () => import("@/components/ui/delivery-map").then(mod => ({ default: mod.DeliveryMap })),
+  { 
+    ssr: false,
+    loading: () => (
+      <div className="w-full h-96 rounded-lg bg-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+          <p className="text-gray-600">Loading map...</p>
+        </div>
+      </div>
+    )
+  }
+)
 
 export default function TrackOrderPage() {
   const [orderNumber, setOrderNumber] = useState("")
@@ -83,6 +100,15 @@ export default function TrackOrderPage() {
           lat: 19.0760,
           lng: 72.8777,
           address: "123 Main Street, Mumbai, Maharashtra 400001"
+        },
+        pharmacyLocation: {
+          lat: 19.0800,
+          lng: 72.8750,
+          name: "HealthCare Pharmacy"
+        },
+        currentLocation: {
+          lat: 19.0780,
+          lng: 72.8765
         },
         timeline: [
           { 
@@ -254,6 +280,46 @@ export default function TrackOrderPage() {
                     </div>
                   </div>
                 )}
+              </CardContent>
+            </Card>
+
+            {/* Live Delivery Map */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Navigation className="h-5 w-5 mr-2" />
+                  Live Delivery Tracking
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {orderData.pharmacyLocation && orderData.deliveryLocation && (
+                  <DeliveryMap
+                    pharmacyLocation={orderData.pharmacyLocation}
+                    deliveryLocation={orderData.deliveryLocation}
+                    currentLocation={orderData.currentLocation}
+                    deliveryStatus={orderData.status}
+                  />
+                )}
+                <div className="grid grid-cols-3 gap-4 mt-4 text-sm">
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 bg-green-500 rounded-full flex items-center justify-content-center">
+                      <span className="text-xs">🏥</span>
+                    </div>
+                    <span>Pharmacy</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-content-center">
+                      <span className="text-xs">🚚</span>
+                    </div>
+                    <span>Delivery Agent</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 bg-red-500 rounded-full flex items-center justify-content-center">
+                      <span className="text-xs">🏠</span>
+                    </div>
+                    <span>Your Location</span>
+                  </div>
+                </div>
               </CardContent>
             </Card>
 
