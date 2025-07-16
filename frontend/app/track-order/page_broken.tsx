@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import { CheckCircle, Package, Truck, MapPin, ArrowLeft, Search, Phone, Clock, Shield, Navigation } from "lucide-react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
-import { orderApi } from "@/lib/order-api"
+import { orderApi } from "@/lib/api"
 import dynamic from "next/dynamic"
 
 // Dynamically import the map component to avoid SSR issues
@@ -138,56 +138,55 @@ export default function TrackOrderPage() {
             lng: 72.8765
           },
           timeline: [
-            { 
-              status: "Order Placed", 
-              time: "Today, 10:30 AM", 
-              completed: true,
-              description: "Your order has been placed successfully",
-              location: "Mumbai"
-            },
-            { 
-              status: "Order Confirmed", 
-              time: "Today, 11:15 AM", 
-              completed: true,
-              description: "Pharmacy confirmed your order",
-              location: "HealthCare Pharmacy"
-            },
-            { 
-              status: "Processing", 
-              time: "Today, 2:45 PM", 
-              completed: true,
-              description: "Your medicines are being prepared",
-              location: "HealthCare Pharmacy"
-            },
-            { 
-              status: "Packed", 
-              time: "Today, 3:30 PM", 
-              completed: true,
-              description: "Order packed and ready for pickup",
-              location: "HealthCare Pharmacy"
-            },
-            { 
-              status: "In Transit", 
-              time: "Today, 4:15 PM", 
-              completed: true,
-              description: "On the way to your location",
-              location: "Bandra West"
-            },
-            { 
-              status: "Delivered", 
-              time: "Tomorrow, 2:00 PM", 
-              completed: false,
-              description: "Delivery to your doorstep",
-              location: "Your Address"
-            },
-          ],
-          specialInstructions: [
-            "Keep medicines in cool, dry place",
-            "Take Cetirizine after meals",
-            "Store away from children"
-          ]
-        })
-      }
+          { 
+            status: "Order Placed", 
+            time: "Today, 10:30 AM", 
+            completed: true,
+            description: "Order received and payment confirmed",
+            location: "Avaxen Platform"
+          },
+          { 
+            status: "Prescription Verified", 
+            time: "Today, 10:45 AM", 
+            completed: true,
+            description: "Prescription verified by Dr. Priya Sharma",
+            location: "HealthCare Pharmacy"
+          },
+          { 
+            status: "Medicine Packed", 
+            time: "Today, 2:15 PM", 
+            completed: true,
+            description: "Medicines packed with quality check",
+            location: "HealthCare Pharmacy"
+          },
+          { 
+            status: "Out for Delivery", 
+            time: "Today, 3:30 PM", 
+            completed: true,
+            description: "Picked up by delivery partner Rajesh",
+            location: "Mumbai Distribution Center"
+          },
+          { 
+            status: "In Transit", 
+            time: "Today, 4:15 PM", 
+            completed: true,
+            description: "On the way to your location",
+            location: "Bandra West"
+          },
+          { 
+            status: "Delivered", 
+            time: "Tomorrow, 2:00 PM", 
+            completed: false,
+            description: "Delivery to your doorstep",
+            location: "Your Address"
+          },
+        ],
+        specialInstructions: [
+          "Keep medicines in cool, dry place",
+          "Take Cetirizine after meals",
+          "Store away from children"
+        ]
+      })
     }
     setIsLoading(false)
   }
@@ -221,7 +220,7 @@ export default function TrackOrderPage() {
             <h2 className="text-lg font-semibold mb-4">Enter Order Number</h2>
             <div className="flex gap-2">
               <Input
-                placeholder="Enter your order number (e.g., AV98175350)"
+                placeholder="Enter your order number (e.g., AVX123456789)"
                 value={orderNumber}
                 onChange={(e) => setOrderNumber(e.target.value)}
                 onKeyPress={(e) => e.key === "Enter" && handleTrack()}
@@ -231,15 +230,6 @@ export default function TrackOrderPage() {
                 {isLoading ? "Tracking..." : "Track"}
               </Button>
             </div>
-            <p className="text-sm text-gray-600 mt-2">
-              💡 Try the sample order: <Button 
-                variant="link" 
-                className="p-0 h-auto text-blue-600" 
-                onClick={() => {setOrderNumber("AV98175350"); trackOrder("AV98175350")}}
-              >
-                AV98175350
-              </Button>
-            </p>
           </CardContent>
         </Card>
 
@@ -250,7 +240,7 @@ export default function TrackOrderPage() {
               <div className="flex items-center gap-3">
                 <div className="text-red-600">⚠️</div>
                 <div>
-                  <h3 className="font-semibold text-red-800">Notice</h3>
+                  <h3 className="font-semibold text-red-800">Error</h3>
                   <p className="text-red-700 text-sm">{error}</p>
                 </div>
               </div>
@@ -354,20 +344,20 @@ export default function TrackOrderPage() {
                 )}
                 <div className="grid grid-cols-3 gap-4 mt-4 text-sm">
                   <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
-                      <span className="text-xs text-white">🏥</span>
+                    <div className="w-4 h-4 bg-green-500 rounded-full flex items-center justify-content-center">
+                      <span className="text-xs">🏥</span>
                     </div>
                     <span>Pharmacy</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
-                      <span className="text-xs text-white">🚚</span>
+                    <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-content-center">
+                      <span className="text-xs">🚚</span>
                     </div>
                     <span>Delivery Agent</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
-                      <span className="text-xs text-white">🏠</span>
+                    <div className="w-4 h-4 bg-red-500 rounded-full flex items-center justify-content-center">
+                      <span className="text-xs">🏠</span>
                     </div>
                     <span>Your Location</span>
                   </div>
@@ -486,19 +476,7 @@ export default function TrackOrderPage() {
           </div>
         )}
 
-        {orderData === null && !error && !isLoading && (
-          <Card>
-            <CardContent className="text-center py-12">
-              <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Enter Order Number</h3>
-              <p className="text-gray-600">
-                Enter your order number above to track your medicine delivery.
-              </p>
-            </CardContent>
-          </Card>
-        )}
-
-        {error && orderData === null && (
+        {orderData === null && (
           <Card>
             <CardContent className="text-center py-12">
               <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />

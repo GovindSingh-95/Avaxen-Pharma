@@ -22,8 +22,8 @@ router.put('/cart/update', protect, updateCartItem);
 router.delete('/cart/remove/:medicineId', protect, removeFromCart);
 router.delete('/cart/clear', protect, clearCart);
 
-// Payment routes
-router.post('/payment/create-order', protect, createRazorpayOrder);
+// Payment routes (public for now - for testing)
+router.post('/payment/create-order', createRazorpayOrder);
 
 // Public tracking route (before parameterized routes)
 router.get('/track/:orderNumber', trackOrder);

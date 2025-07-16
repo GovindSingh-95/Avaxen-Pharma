@@ -65,7 +65,7 @@ export class RazorpayGateway {
       const data = await response.json()
       
       if (data.success) {
-        return data.orderId
+        return data.data.id // Razorpay order ID
       } else {
         throw new Error(data.message || 'Failed to create order')
       }

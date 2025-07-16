@@ -4,6 +4,7 @@ const Medicine = require('../models/Medicine');
 const User = require('../models/User');
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
+const mongoose = require('mongoose');
 
 // Initialize Razorpay only if keys are provided
 let razorpay;

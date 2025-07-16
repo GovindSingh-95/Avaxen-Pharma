@@ -272,9 +272,6 @@ export default function CheckoutPage() {
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading checkout...</p>
-          <p className="text-xs text-gray-500 mt-2">
-            Cart data: {typeof window !== 'undefined' ? localStorage.getItem("cart") : 'loading...'}
-          </p>
         </div>
       </div>
     )
