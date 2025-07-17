@@ -21,12 +21,113 @@ import {
   Scan,
   Menu,
   X,
+  User,
+  LogOut,
 } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { medicineApi, type Medicine } from "@/lib/api"
 import MedicineImage from "@/components/ui/medicine-image"
+import { useAuth } from "@/contexts/AuthContext"
 // import { ApiHealthCheck } from "@/components/ApiHealthCheck"
+
+// Desktop Actions Component
+function DesktopActions() {
+  const { user, logout } = useAuth()
+
+  if (user) {
+    return (
+      <div className="hidden md:flex items-center space-x-3">
+        <Button variant="ghost" size="sm" asChild>
+          <Link href="/profile">
+            <Heart className="h-4 w-4" />
+          </Link>
+        </Button>
+        <Button variant="ghost" size="sm" asChild>
+          <Link href="/cart">
+            <ShoppingCart className="h-4 w-4" />
+          </Link>
+        </Button>
+        <div className="flex items-center space-x-2">
+          <Button variant="ghost" size="sm" asChild>
+            <Link href="/profile" className="flex items-center space-x-2">
+              <User className="h-4 w-4" />
+              <span className="text-sm">{user.name}</span>
+            </Link>
+          </Button>
+          <Button variant="ghost" size="sm" onClick={logout}>
+            <LogOut className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="hidden md:flex items-center space-x-3">
+      <Button variant="ghost" size="sm" asChild>
+        <Link href="/cart">
+          <ShoppingCart className="h-4 w-4" />
+        </Link>
+      </Button>
+      <Button variant="outline" size="sm" asChild>
+        <Link href="/login">Login</Link>
+      </Button>
+      <Button size="sm" asChild>
+        <Link href="/register">Sign Up</Link>
+      </Button>
+    </div>
+  )
+}
+
+// Mobile Actions Component
+function MobileActions() {
+  const { user, logout } = useAuth()
+
+  if (user) {
+    return (
+      <div className="flex flex-col space-y-2 pt-3 border-t border-gray-100">
+        <div className="flex items-center space-x-3">
+          <Button variant="ghost" size="sm" asChild>
+            <Link href="/profile" className="flex items-center space-x-2">
+              <User className="h-4 w-4" />
+              <span>{user.name}</span>
+            </Link>
+          </Button>
+          <Button variant="ghost" size="sm" asChild>
+            <Link href="/cart">
+              <ShoppingCart className="h-4 w-4" />
+              <span className="ml-2">Cart</span>
+            </Link>
+          </Button>
+        </div>
+        <Button variant="ghost" size="sm" onClick={logout} className="flex items-center justify-start space-x-2">
+          <LogOut className="h-4 w-4" />
+          <span>Logout</span>
+        </Button>
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex flex-col space-y-2 pt-3 border-t border-gray-100">
+      <div className="flex items-center space-x-3">
+        <Button variant="ghost" size="sm" asChild>
+          <Link href="/cart">
+            <ShoppingCart className="h-4 w-4" />
+            <span className="ml-2">Cart</span>
+          </Link>
+        </Button>
+        <Button variant="outline" size="sm" asChild>
+          <Link href="/login">Login</Link>
+        </Button>
+      </div>
+      <Button size="sm" asChild>
+        <Link href="/register">Sign Up</Link>
+      </Button>
+    </div>
+  )
+}
 
 export default function HomePage() {
   const [searchTerm, setSearchTerm] = useState("")
@@ -105,21 +206,7 @@ export default function HomePage() {
             </nav>
 
             {/* Desktop Actions */}
-            <div className="hidden md:flex items-center space-x-3">
-              <Button variant="ghost" size="sm" asChild>
-                <Link href="/profile">
-                  <Heart className="h-4 w-4" />
-                </Link>
-              </Button>
-              <Button variant="ghost" size="sm" asChild>
-                <Link href="/cart">
-                  <ShoppingCart className="h-4 w-4" />
-                </Link>
-              </Button>
-              <Button size="sm" asChild>
-                <Link href="/profile">Login</Link>
-              </Button>
-            </div>
+            <DesktopActions />
 
             {/* Mobile Menu Button */}
             <Button variant="ghost" size="sm" className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
@@ -143,14 +230,7 @@ export default function HomePage() {
                 <Link href="/upload-prescription" className="text-gray-600 hover:text-blue-600 transition-colors">
                   Upload Prescription
                 </Link>
-                <div className="flex items-center space-x-3 pt-3 border-t border-gray-100">
-                  <Button variant="ghost" size="sm" asChild>
-                    <Link href="/profile">Profile</Link>
-                  </Button>
-                  <Button variant="ghost" size="sm" asChild>
-                    <Link href="/cart">Cart</Link>
-                  </Button>
-                </div>
+                <MobileActions />
               </nav>
             </div>
           )}
