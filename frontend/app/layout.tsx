@@ -10,9 +10,9 @@ import { Toaster } from "@/components/ui/toaster"
 const fontClass = "font-sans"
 
 export const metadata: Metadata = {
-  title: "Avaxen - Your Trusted Online Pharmacy",
+  title: "Avaxan - Your Trusted Online Pharmacy",
   description:
-    "Get genuine medicines delivered to your doorstep. Fast, reliable, and affordable healthcare solutions from Avaxen - your trusted online pharmacy.",
+    "Get genuine medicines delivered to your doorstep. Fast, reliable, and affordable healthcare solutions from Avaxan - your trusted online pharmacy.",
   keywords: "online pharmacy, medicines, healthcare, prescription drugs, health products, medical supplies",
     generator: 'v0.dev'
 }

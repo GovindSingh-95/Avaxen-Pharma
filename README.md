@@ -1,6 +1,6 @@
-# 🏥 Avaxen - Online Pharmacy Platform
+# 🏥 Avaxan - Online Pharmacy Platform
 
-A comprehensive, production-ready online pharmacy platform built with modern technologies. Avaxen provides a complete solution for managing medicines, processing orders, handling prescriptions, and delivering healthcare products directly to customers.
+A comprehensive, production-ready online pharmacy platform built with modern technologies. Avaxan provides a complete solution for managing medicines, processing orders, handling prescriptions, and delivering healthcare products directly to customers.
 
 ## ✨ Features
 

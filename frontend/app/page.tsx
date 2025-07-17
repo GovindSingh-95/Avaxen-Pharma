@@ -80,10 +80,12 @@ export default function HomePage() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center space-x-2">
-              <div className="bg-blue-600 p-2 rounded-lg">
-                <Pill className="h-5 w-5 text-white" />
-              </div>
-              <span className="text-xl font-bold text-gray-900">Avaxen</span>
+              <img 
+                src="/avaxan-logo.png" 
+                alt="Avaxan Logo" 
+                className="h-8 w-8"
+              />
+              <span className="text-xl font-bold text-gray-900">Avaxan</span>
             </Link>
 
             {/* Desktop Navigation */}
@@ -384,10 +386,12 @@ export default function HomePage() {
           <div className="grid md:grid-cols-3 gap-8 mb-8">
             <div>
               <Link href="/" className="flex items-center space-x-2 mb-4">
-                <div className="bg-blue-600 p-2 rounded-lg">
-                  <Pill className="h-5 w-5 text-white" />
-                </div>
-                <span className="text-xl font-bold">Avaxen</span>
+                <img 
+                  src="/avaxan-logo.png" 
+                  alt="Avaxan Logo" 
+                  className="h-8 w-8"
+                />
+                <span className="text-xl font-bold">Avaxan</span>
               </Link>
               <p className="text-gray-400">Your trusted online pharmacy for genuine medicines and healthcare.</p>
             </div>
@@ -422,14 +426,14 @@ export default function HomePage() {
               <h3 className="font-semibold mb-4">Support</h3>
               <ul className="space-y-2 text-gray-400">
                 <li>📞 1800-123-4567</li>
-                <li>📧 support@avaxen.com</li>
+                <li>📧 support@avaxan.com</li>
                 <li>🕒 24/7 Support</li>
               </ul>
             </div>
           </div>
 
           <div className="border-t border-gray-800 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 Avaxen. Licensed Online Pharmacy.</p>
+            <p>&copy; 2024 Avaxan. Licensed Online Pharmacy.</p>
           </div>
         </div>
       </footer>
