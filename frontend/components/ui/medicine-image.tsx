@@ -11,22 +11,29 @@ interface MedicineImageProps {
   fallbackType?: 'placeholder' | 'category' | 'form'
 }
 
-// Reliable fallback images (these won't break)
+// Professional medicine images that work reliably
 const FALLBACK_IMAGES = {
   categories: {
-    'Pain Relief': '/placeholder.svg',
-    'Antibiotics': '/placeholder.svg', 
-    'Supplements': '/placeholder.svg',
-    'Digestive Health': '/placeholder.svg',
-    'Allergy': '/placeholder.svg',
-    'default': '/placeholder.svg'
+    'Pain Relief': 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400&h=400&fit=crop&auto=format',
+    'Antibiotics': 'https://images.unsplash.com/photo-1550572017-edd951aa8ca6?w=400&h=400&fit=crop&auto=format', 
+    'Supplements': 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&h=400&fit=crop&auto=format',
+    'Digestive Health': 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=400&h=400&fit=crop&auto=format',
+    'Allergy': 'https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?w=400&h=400&fit=crop&auto=format',
+    'Heart Care': 'https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=400&h=400&fit=crop&auto=format',
+    'Diabetes': 'https://images.unsplash.com/photo-1583244685026-d8519b5e7be7?w=400&h=400&fit=crop&auto=format',
+    'Skin Care': 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400&h=400&fit=crop&auto=format',
+    'Eye Care': 'https://images.unsplash.com/photo-1559181567-c3190ca9959b?w=400&h=400&fit=crop&auto=format',
+    'default': 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400&h=400&fit=crop&auto=format'
   } as Record<string, string>,
   forms: {
-    'Tablet': '/placeholder.svg',
-    'Capsule': '/placeholder.svg', 
-    'Syrup': '/placeholder.svg',
-    'Cream': '/placeholder.svg',
-    'default': '/placeholder.svg'
+    'Tablet': 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400&h=400&fit=crop&auto=format',
+    'Capsule': 'https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?w=400&h=400&fit=crop&auto=format', 
+    'Syrup': 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=400&h=400&fit=crop&auto=format',
+    'Cream': 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400&h=400&fit=crop&auto=format',
+    'Ointment': 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400&h=400&fit=crop&auto=format',
+    'Drops': 'https://images.unsplash.com/photo-1559181567-c3190ca9959b?w=400&h=400&fit=crop&auto=format',
+    'Injection': 'https://images.unsplash.com/photo-1579952363873-27d3bfad9c0d?w=400&h=400&fit=crop&auto=format',
+    'default': 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400&h=400&fit=crop&auto=format'
   } as Record<string, string>
 }
 
