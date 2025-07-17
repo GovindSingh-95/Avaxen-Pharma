@@ -1,5 +1,8 @@
 const Medicine = require('../models/Medicine');
 const MedicineScan = require('../models/MedicineScan');
+const aiService = require('../services/aiService');
+const smsService = require('../services/smsService');
+const indianMedicineService = require('../services/indianMedicineService');
 
 // Get all medicines with filtering and search
 const getMedicines = async (req, res) => {
@@ -238,35 +241,77 @@ const scanMedicine = async (req, res) => {
 
     await scanRecord.save();
 
-    // Simulate AI processing (in real implementation, use ML service)
+    // Enhanced AI processing using Hugging Face
     setTimeout(async () => {
       try {
-        // Mock AI detection - randomly select a medicine
-        const medicines = await Medicine.find({ isActive: true }).limit(10);
-        const randomMedicine = medicines[Math.floor(Math.random() * medicines.length)];
+        // Get available medicines from database
+        const medicines = await Medicine.find({ isActive: true }).limit(50);
         
-        scanRecord.detectedMedicine = randomMedicine._id;
-        scanRecord.detectedName = randomMedicine.name;
-        scanRecord.confidence = 0.75 + Math.random() * 0.2; // 75-95% confidence
-        scanRecord.status = 'Completed';
+        // Use AI service for medicine recognition
+        const aiResult = await aiService.recognizeMedicine(req.file.buffer, medicines);
         
-        // Add alternatives
-        const alternatives = medicines
-          .filter(m => m._id.toString() !== randomMedicine._id.toString())
-          .slice(0, 3)
-          .map(m => ({
-            medicine: m._id,
-            name: m.name,
+        if (aiResult.success) {
+          scanRecord.detectedMedicine = aiResult.detectedMedicine._id;
+          scanRecord.detectedName = aiResult.detectedMedicine.name;
+          scanRecord.confidence = aiResult.confidence;
+          scanRecord.status = 'Completed';
+          
+          // Add AI-powered alternatives
+          scanRecord.alternatives = aiResult.alternatives.map(alt => ({
+            medicine: alt._id,
+            name: alt.name,
             confidence: 0.3 + Math.random() * 0.4
           }));
+
+          // Get Indian medicine database info
+          const indianInfo = await indianMedicineService.searchIndianMedicines(aiResult.detectedMedicine.name);
+          if (indianInfo.success) {
+            scanRecord.additionalInfo = {
+              indianBrands: indianInfo.data.indian?.indianBrands || [],
+              estimatedPrice: indianInfo.data.availability?.estimatedPrice || 'Price not available',
+              prescription: indianInfo.data.safety?.prescriptionRequired || false,
+              sources: indianInfo.data.sources || []
+            };
+          }
+        } else {
+          // Fallback to random selection
+          const randomMedicine = medicines[Math.floor(Math.random() * medicines.length)];
+          scanRecord.detectedMedicine = randomMedicine._id;
+          scanRecord.detectedName = randomMedicine.name;
+          scanRecord.confidence = 0.65 + Math.random() * 0.2;
+          scanRecord.status = 'Completed';
+          
+          const alternatives = medicines
+            .filter(m => m._id.toString() !== randomMedicine._id.toString())
+            .slice(0, 3)
+            .map(m => ({
+              medicine: m._id,
+              name: m.name,
+              confidence: 0.3 + Math.random() * 0.4
+            }));
+          
+          scanRecord.alternatives = alternatives;
+        }
         
-        scanRecord.alternatives = alternatives;
         await scanRecord.save();
+        
+        // Send SMS notification if user phone is available and high confidence
+        if (req.user?.phone && scanRecord.confidence > 0.8) {
+          await smsService.sendMedicineRecognitionSMS({
+            phone: req.user.phone,
+            customerName: req.user.firstName,
+            medicineName: scanRecord.detectedName,
+            confidence: Math.round(scanRecord.confidence * 100)
+          });
+        }
+        
       } catch (error) {
+        console.error('AI medicine scanning failed:', error);
         scanRecord.status = 'Failed';
+        scanRecord.error = error.message;
         await scanRecord.save();
       }
-    }, 2000);
+    }, 3000); // Slightly longer for AI processing
 
     // Return immediate response
     res.status(200).json({

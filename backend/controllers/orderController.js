@@ -5,6 +5,7 @@ const User = require('../models/User');
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
 const mongoose = require('mongoose');
+const smsService = require('../services/smsService');
 
 // Initialize Razorpay only if keys are provided
 let razorpay;
@@ -373,6 +374,26 @@ const createOrder = async (req, res) => {
     });
 
     await order.save();
+
+    // Send notifications (SMS) - Non-blocking
+    setImmediate(async () => {
+      try {
+        // Get user details
+        const user = await User.findById(req.user.id);
+        
+        if (user?.phone) {
+          await smsService.sendOrderConfirmationSMS({
+            phone: user.phone,
+            customerName: user.firstName,
+            orderNumber: order.orderNumber,
+            totalAmount: totalAmount
+          });
+        }
+      } catch (notificationError) {
+        console.error('Notification sending failed:', notificationError);
+        // Don't fail the order creation for notification errors
+      }
+    });
 
     res.status(201).json({
       success: true,

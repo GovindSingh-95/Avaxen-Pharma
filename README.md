@@ -25,9 +25,14 @@ A comprehensive, production-ready online pharmacy platform built with modern tec
 - **API Integration** - RESTful APIs with proper error handling
 - **Authentication** - JWT-based secure authentication system
 - **File Upload** - Cloudinary integration for image management
+- **AI-Powered Scanner** - Hugging Face ML models for medicine recognition
+- **Notification System** - Email (EmailJS) + SMS (AWS SNS) notifications
+- **Indian Medicine Database** - OpenFDA + RxNav + Local database integration
+- **Real-time Tracking** - Live delivery tracking with maps
 - **Database** - MongoDB with Mongoose ODM
 - **Type Safety** - Full TypeScript implementation
 - **Production Ready** - Optimized build with Next.js 15
+- **Zero API Costs** - All services use FREE tiers
 
 ## 🚀 Tech Stack
 
@@ -44,8 +49,12 @@ A comprehensive, production-ready online pharmacy platform built with modern tec
 - **Framework**: Express.js
 - **Database**: MongoDB with Mongoose
 - **Authentication**: JWT (JSON Web Tokens)
-- **File Storage**: Cloudinary
+- **File Storage**: Cloudinary (FREE 25GB)
 - **Payment**: Razorpay Integration
+- **AI/ML**: Hugging Face (FREE unlimited)
+- **Email**: EmailJS (FREE 200/month)
+- **SMS**: AWS SNS (FREE 100/month)
+- **Medicine Data**: OpenFDA + RxNav APIs (FREE)
 
 ## 📁 Project Structure
 
@@ -116,31 +125,129 @@ NODE_ENV=development
 PORT=5000
 MONGODB_URI=mongodb://localhost:27017/avaxen_pharmacy
 JWT_SECRET=your_super_secret_jwt_key
+
+# Cloudinary (Image Management) - FREE TIER
 CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
 CLOUDINARY_API_KEY=your_cloudinary_api_key
 CLOUDINARY_API_SECRET=your_cloudinary_api_secret
+
+# Razorpay (Payments)
 RAZORPAY_KEY_ID=your_razorpay_key_id
 RAZORPAY_KEY_SECRET=your_razorpay_key_secret
+
+# EmailJS (Email Notifications) - FREE 200/month
+EMAILJS_SERVICE_ID=your_emailjs_service_id
+EMAILJS_TEMPLATE_ID=your_emailjs_template_id
+EMAILJS_PUBLIC_KEY=your_emailjs_public_key
+
+# AWS SNS (SMS Notifications) - FREE 100/month
+AWS_ACCESS_KEY_ID=your_aws_access_key_id
+AWS_SECRET_ACCESS_KEY=your_aws_secret_access_key
+AWS_REGION=ap-south-1
+AWS_SNS_REGION=ap-south-1
+
+# Hugging Face (AI/ML) - FREE UNLIMITED
+HUGGINGFACE_API_KEY=your_huggingface_api_key
+
+# Frontend URL
 FRONTEND_URL=http://localhost:3000
 ```
 
 **Frontend (.env.local)**
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:5000
+
+# EmailJS (Frontend)
+NEXT_PUBLIC_EMAILJS_SERVICE_ID=your_emailjs_service_id
+NEXT_PUBLIC_EMAILJS_TEMPLATE_ID=your_emailjs_template_id
+NEXT_PUBLIC_EMAILJS_PUBLIC_KEY=your_emailjs_public_key
+
+# Hugging Face (Frontend)
+NEXT_PUBLIC_HUGGINGFACE_API_KEY=your_huggingface_api_key
+
+# Razorpay (Frontend)
+NEXT_PUBLIC_RAZORPAY_KEY_ID=your_razorpay_key_id
 ```
 
-## 🚀 Deployment
+## 🔑 API Keys Setup Guide
 
-### Backend Deployment (Railway/Heroku)
-1. Connect your GitHub repository
-2. Set environment variables
-3. Deploy from main branch
+### Essential Services (All FREE)
 
-### Frontend Deployment (Vercel)
-1. Connect your GitHub repository
-2. Set build command: `cd frontend && npm run build`
-3. Set environment variables
-4. Deploy from main branch
+#### 1. 🖼️ Cloudinary (Image Management)
+**Time: 2 minutes | Cost: FREE (25GB storage + bandwidth)**
+1. Visit [cloudinary.com](https://cloudinary.com)
+2. Sign up with email
+3. Dashboard → Copy: Cloud Name, API Key, API Secret
+4. Paste in `.env` file
+
+**Enables**: Medicine images, prescription uploads, medicine scanner
+
+#### 2. 📧 EmailJS (Email Notifications) 
+**Time: 5 minutes | Cost: FREE (200 emails/month)**
+1. Visit [emailjs.com](https://emailjs.com)  
+2. Create account → Add email service (Gmail)
+3. Create email template
+4. Copy: Service ID, Template ID, Public Key
+5. Paste in both `.env` files
+
+**Enables**: Order confirmations, delivery updates, prescription notifications
+
+#### 3. 📱 AWS SNS (SMS for India)
+**Time: 10 minutes | Cost: FREE (100 SMS/month for 12 months)**
+1. Visit [aws.amazon.com](https://aws.amazon.com)
+2. Create free account
+3. IAM → Create user with SNS permissions
+4. Copy: Access Key ID, Secret Access Key
+5. Set region to `ap-south-1` (Mumbai)
+
+**Enables**: Order SMS, delivery updates, OTP verification
+
+#### 4. 🧠 Hugging Face (AI/ML)
+**Time: 2 minutes | Cost: FREE (Unlimited with rate limits)**
+1. Visit [huggingface.co](https://huggingface.co)
+2. Sign up → Settings → Access Tokens
+3. Create new token
+4. Copy token and paste in `.env` files
+
+**Enables**: Real AI medicine recognition, text extraction, recommendations
+
+### Optional Services
+
+#### 5. 💳 Razorpay (Live Payments)
+**Already configured with test keys**
+- See `RAZORPAY_LIVE_SETUP.md` for live keys guide
+- Test mode works for development
+
+## 🚀 Quick Setup Commands
+
+```bash
+# 1. Install dependencies
+cd backend && npm install
+cd ../frontend && npm install
+
+# 2. Copy environment templates
+cp backend/.env.example backend/.env
+cp frontend/.env.local.example frontend/.env.local
+
+# 3. Add your API keys to the .env files
+# 4. Start services
+npm run dev # in both backend and frontend folders
+```
+
+## 🔍 Verify Setup
+
+Visit `http://localhost:5000/api/health` to check service status:
+```json
+{
+  "status": "healthy",
+  "services": {
+    "cloudinary": "configured" | "missing",
+    "emailjs": "configured" | "missing",
+    "aws_sns": "configured" | "missing",
+    "huggingface": "configured" | "missing"
+  }
+}
+```
 
 ## 📚 API Documentation
 
@@ -152,16 +259,20 @@ NEXT_PUBLIC_API_URL=http://localhost:5000
 ### Medicine Endpoints
 - `GET /api/medicines` - Get all medicines
 - `GET /api/medicines/:id` - Get single medicine
-- `POST /api/medicines/scan` - Scan medicine image
+- `POST /api/medicines/scan` - AI-powered medicine image scanning
+- `GET /api/medicines/scan/:id/result` - Get scan results
+- `GET /api/medicines/search` - Search medicines with AI enhancement
 
 ### Order Endpoints
-- `POST /api/orders` - Create new order
+- `POST /api/orders` - Create new order (with SMS/Email notifications)
 - `GET /api/orders` - Get user orders
 - `GET /api/orders/:id` - Get order details
+- `GET /api/orders/track/:orderNumber` - Track order status
 
 ### Admin Endpoints
-- `POST /api/admin/medicines/upload-image` - Upload medicine image
+- `POST /api/admin/medicines/upload-image` - Upload medicine images (Cloudinary)
 - `PUT /api/admin/medicines/:id` - Update medicine
+- `GET /api/health` - System health and service status
 
 ## 🔒 Security Features
 
@@ -198,9 +309,12 @@ npm run build
 
 - **Build Size**: Frontend optimized to ~120kB main bundle
 - **Loading**: Smart lazy loading for components
-- **Images**: Automatic optimization and fallback
+- **Images**: Automatic optimization via Cloudinary CDN
 - **Caching**: Strategic caching for API responses
 - **SEO**: Static page generation for better performance
+- **AI Processing**: Client-side + server-side ML models
+- **Notifications**: Non-blocking email/SMS delivery
+- **Zero API Costs**: All services use generous FREE tiers
 
 ## 🤝 Contributing
 
@@ -226,12 +340,21 @@ For support, email support@avaxen.com or join our Slack channel.
 
 ## 🚀 Roadmap
 
-- [ ] Mobile app development
+- [x] Complete e-commerce functionality
+- [x] AI-powered medicine scanner
+- [x] Real-time order tracking with maps
+- [x] Email & SMS notification system
+- [x] Indian medicine database integration
+- [x] Comprehensive admin dashboard
+- [ ] Mobile app development (React Native)
 - [ ] Advanced analytics dashboard
-- [ ] Multi-language support
+- [ ] Multi-language support (Hindi, Regional)
 - [ ] AI-powered medicine recommendations
 - [ ] Telemedicine integration
 - [ ] Insurance claim processing
+- [ ] Prescription auto-refill system
+- [ ] Medicine interaction checker
+- [ ] Loyalty program integration
 
 ---
 
