@@ -170,9 +170,9 @@ npm run dev
 | Service | Status | Monthly Cost | Features Enabled |
 |---------|--------|--------------|------------------|
 | **Cloudinary** | ✅ Configured | ₹0 | Image uploads, CDN |
-| **EmailJS** | 🟡 Needs Keys | ₹0 | Order emails, notifications |
-| **AWS SNS** | 🟡 Needs Keys | ₹0 | SMS notifications |
-| **Hugging Face** | 🟡 Needs Keys | ₹0 | AI medicine recognition |
+| **EmailJS** | ✅ Configured | ₹0 | Order emails, notifications |
+| **AWS SNS** | 🟡 Skipped | ₹0 | SMS notifications (optional) |
+| **Hugging Face** | ✅ Configured | ₹0 | AI medicine recognition |
 | **Medicine APIs** | ✅ Working | ₹0 | Indian medicine data |
 
 ---
