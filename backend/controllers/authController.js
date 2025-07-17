@@ -2,7 +2,39 @@ const User = require('../models/User');
 const Medicine = require('../models/Medicine');
 
 // Register User
-const registerUser = async (req, res) => {
+const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
+const User = require('../models/User')
+const crypto = require('crypto')
+
+// Generate enhanced JWT token with additional security
+const generateEnhancedToken = (userId, email, name) => {
+  const payload = {
+    userId,
+    email,
+    name,
+    platform: 'avaxan-pharmacy',
+    issued: Date.now(),
+    version: '2.0'
+  }
+  
+  return jwt.sign(payload, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN || '7d',
+    issuer: 'avaxan-pharmacy',
+    audience: 'avaxan-users'
+  })
+}
+
+// Generate refresh token
+const generateRefreshToken = (userId) => {
+  return jwt.sign(
+    { userId, type: 'refresh' },
+    process.env.JWT_REFRESH_SECRET,
+    { expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '30d' }
+  )
+}
+
+const register = async (req, res) => {
   try {
     const { firstName, lastName, email, password, phone } = req.body;
 

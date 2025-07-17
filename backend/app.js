@@ -3,6 +3,12 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
 const connectDB = require('./utils/connectDB');
+const { 
+  generalLimiter, 
+  securityHeaders, 
+  corsOptions, 
+  securityLogger 
+} = require('./middlewares/advancedSecurity');
 
 // Load environment variables from the correct path
 dotenv.config({ path: path.join(__dirname, '.env') });
@@ -13,19 +19,30 @@ const app = express();
 // Connect to MongoDB
 connectDB();
 
-// Middleware
-app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-  credentials: true
-}));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Security Middleware
+app.use(securityLogger); // Log all requests for security audit
+app.use(securityHeaders); // Security headers
+app.use(cors(corsOptions)); // Enhanced CORS
+app.use(generalLimiter); // Rate limiting
+app.use(express.json({ limit: '10mb' })); // Limit payload size
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Basic route
+// Basic route with enhanced security info
 app.get('/', (req, res) => {
   res.json({ 
-    message: 'Avaxen Pharmacy API is running!',
-    version: '1.0.0',
+    message: 'Avaxan Pharmacy API is running!',
+    version: '2.0.0',
+    security: {
+      platform: 'avaxan-pharmacy',
+      securityVersion: '2.0',
+      encryption: 'AES-256-GCM',
+      rateLimiting: 'active',
+      cors: 'enhanced'
+    },
+    compliance: {
+      pharmacyLicense: 'MH-PH-2025-AVAXAN-001',
+      healthcareCompliance: 'AVAXAN-HC-2025-INDIA'
+    },
     timestamp: new Date().toISOString()
   });
 });
