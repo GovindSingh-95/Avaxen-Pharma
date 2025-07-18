@@ -1,10 +1,7 @@
 const User = require('../models/User');
 const Medicine = require('../models/Medicine');
-
-// Register User
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
-const User = require('../models/User')
 const crypto = require('crypto')
 
 // Generate enhanced JWT token with additional security
@@ -356,7 +353,7 @@ const getWishlist = async (req, res) => {
 };
 
 module.exports = {
-  registerUser,
+  register,
   loginUser,
   getProfile,
   updateProfile,

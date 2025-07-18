@@ -46,8 +46,8 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     // Check if user is admin
-    if (!user || user.role !== 'admin') {
-      router.push('/login')
+    if (!user || !['admin', 'pharmacist'].includes(user.role)) {
+      router.push('/admin/login')
       return
     }
 
@@ -71,15 +71,15 @@ export default function AdminDashboard() {
     }
   }
 
-  if (!user || user.role !== 'admin') {
+  if (!user || !['admin', 'pharmacist'].includes(user.role)) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
           <h2 className="text-2xl font-bold mb-2">Access Denied</h2>
           <p className="text-gray-600 mb-4">You need admin privileges to access this page</p>
-          <Link href="/">
-            <Button>Go to Homepage</Button>
+          <Link href="/admin/login">
+            <Button>Go to Admin Login</Button>
           </Link>
         </div>
       </div>

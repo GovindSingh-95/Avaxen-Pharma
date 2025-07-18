@@ -59,7 +59,7 @@ export default function LoginPage() {
           <CardHeader className="text-center pb-6">
             <div className="flex items-center justify-center mb-4">
               <img 
-                src="/avaxan-logo.png" 
+                src="/axaxan-logo.svg" 
                 alt="Avaxan Logo" 
                 className="h-12 w-12"
               />

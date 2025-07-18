@@ -23,7 +23,17 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   phone: { type: String, required: true },
   addresses: [addressSchema],
-  role: { type: String, enum: ['user', 'admin', 'pharmacist'], default: 'user' },
+  role: { 
+    type: String, 
+    enum: ['user', 'admin', 'pharmacist', 'owner', 'inventory', 'support', 'finance'], 
+    default: 'user' 
+  },
+  permissions: [{ type: String }], // Array of permission strings
+  department: { type: String }, // Department for admin users
+  isActive: { type: Boolean, default: true },
+  lastLogin: { type: Date },
+  createdBy: { type: String }, // Who created this account
+  securityLevel: { type: String, enum: ['low', 'medium', 'high'], default: 'medium' },
   isEmailVerified: { type: Boolean, default: false },
   avatar: { type: String },
   wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Medicine' }]

@@ -182,7 +182,7 @@ export default function HomePage() {
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center space-x-2">
               <img 
-                src="/avaxan-logo.png" 
+                src="/axaxan-logo.svg" 
                 alt="Avaxan Logo" 
                 className="h-8 w-8"
               />
@@ -467,7 +467,7 @@ export default function HomePage() {
             <div>
               <Link href="/" className="flex items-center space-x-2 mb-4">
                 <img 
-                  src="/avaxan-logo.png" 
+                  src="/axaxan-logo.svg" 
                   alt="Avaxan Logo" 
                   className="h-8 w-8"
                 />
