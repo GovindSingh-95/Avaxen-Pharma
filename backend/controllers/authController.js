@@ -33,10 +33,31 @@ const generateRefreshToken = (userId) => {
 
 const register = async (req, res) => {
   try {
-    const { firstName, lastName, email, password, phone } = req.body;
+    console.log('=== REGISTRATION REQUEST ===');
+    console.log('Request body:', req.body);
+    
+    const { name, firstName, lastName, email, password, phone } = req.body;
+
+    // Handle name field - split into firstName and lastName if provided
+    let finalFirstName = firstName;
+    let finalLastName = lastName;
+    
+    if (name && !firstName && !lastName) {
+      const nameParts = name.trim().split(' ');
+      finalFirstName = nameParts[0];
+      finalLastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
+    }
+
+    console.log('Processed names:', { finalFirstName, finalLastName, email, phone });
 
     // Validation
-    if (!firstName || !lastName || !email || !password || !phone) {
+    if (!finalFirstName || !email || !password || !phone) {
+      console.log('Validation failed:', {
+        finalFirstName: !!finalFirstName,
+        email: !!email,
+        password: !!password,
+        phone: !!phone
+      });
       return res.status(400).json({
         success: false,
         message: 'Please provide all required fields'
@@ -54,8 +75,8 @@ const register = async (req, res) => {
 
     // Create user
     const user = await User.create({
-      firstName,
-      lastName,
+      firstName: finalFirstName,
+      lastName: finalLastName,
       email,
       password,
       phone

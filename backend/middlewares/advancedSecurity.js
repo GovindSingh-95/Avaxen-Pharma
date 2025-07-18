@@ -57,11 +57,20 @@ const corsOptions = {
     const allowedOrigins = [
       'https://avaxan-pharma.vercel.app',
       'http://localhost:3000',
-      'http://localhost:3001'
+      'http://localhost:3001',
+      'http://localhost:3002',
+      'http://localhost:3003',
+      'http://localhost:3004',
+      'http://localhost:3005'
     ]
     
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true)
+    
+    // For development, allow any localhost origin
+    if (process.env.NODE_ENV === 'development' && origin && origin.startsWith('http://localhost:')) {
+      return callback(null, true)
+    }
     
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true)

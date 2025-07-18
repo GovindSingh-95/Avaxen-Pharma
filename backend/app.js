@@ -62,6 +62,7 @@ const medicineRoutes = require('./routes/medicines');
 const orderRoutes = require('./routes/orders');
 const prescriptionRoutes = require('./routes/prescription');
 const adminMedicineRoutes = require('./routes/admin/medicines');
+const deliveryRoutes = require('./routes/delivery');
 
 // Use routes
 app.use('/api/auth', authRoutes);
@@ -69,6 +70,7 @@ app.use('/api/medicines', medicineRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/prescription', prescriptionRoutes);
 app.use('/api/admin/medicines', adminMedicineRoutes);
+app.use('/api/delivery', deliveryRoutes);
 
 // Error handling middleware
 const errorHandler = require('./middlewares/errorHandler');

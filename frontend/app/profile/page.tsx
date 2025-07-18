@@ -50,13 +50,15 @@ export default function ProfilePage() {
   const [orders, setOrders] = useState<Order[]>([])
   const [addresses, setAddresses] = useState<Address[]>([])
   const [userProfile, setUserProfile] = useState<UserProfile>({
-    firstName: "John",
-    lastName: "Doe",
-    email: "john.doe@email.com",
-    phone: "+91 98765 43210",
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
   })
   const [isEditing, setIsEditing] = useState(false)
   const [editedProfile, setEditedProfile] = useState<UserProfile>(userProfile)
+  const [editingAddressId, setEditingAddressId] = useState<string | null>(null)
+  const [editingAddress, setEditingAddress] = useState<Address | null>(null)
 
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -76,58 +78,22 @@ export default function ProfilePage() {
       setWishlistMedicines(medicines)
     }
 
-    // Load or create sample orders
+    // Load or create empty orders
     const savedOrders = localStorage.getItem("orders")
     if (savedOrders) {
       setOrders(JSON.parse(savedOrders))
     } else {
-      // Create sample orders
-      const sampleOrders: Order[] = [
-        {
-          id: "ORD001",
-          date: "2024-01-15",
-          items: [
-            { medicineId: 1, quantity: 2, price: 45 },
-            { medicineId: 2, quantity: 1, price: 85 },
-          ],
-          total: 175,
-          status: "Delivered",
-        },
-        {
-          id: "ORD002",
-          date: "2024-01-10",
-          items: [
-            { medicineId: 4, quantity: 1, price: 125 },
-            { medicineId: 3, quantity: 1, price: 320 },
-          ],
-          total: 445,
-          status: "Delivered",
-        },
-      ]
-      setOrders(sampleOrders)
-      localStorage.setItem("orders", JSON.stringify(sampleOrders))
+      // Start with empty orders array
+      setOrders([])
     }
 
-    // Load or create sample addresses
+    // Load saved addresses
     const savedAddresses = localStorage.getItem("addresses")
     if (savedAddresses) {
       setAddresses(JSON.parse(savedAddresses))
     } else {
-      const sampleAddresses: Address[] = [
-        {
-          id: "addr1",
-          type: "Home",
-          name: "John Doe",
-          phone: "+91 98765 43210",
-          address: "123 Main Street, Apartment 4B",
-          city: "Mumbai",
-          state: "Maharashtra",
-          pincode: "400001",
-          isDefault: true,
-        },
-      ]
-      setAddresses(sampleAddresses)
-      localStorage.setItem("addresses", JSON.stringify(sampleAddresses))
+      // Start with empty addresses array
+      setAddresses([])
     }
 
     // Load user profile
@@ -214,6 +180,74 @@ export default function ProfilePage() {
       ...prev,
       [field]: value,
     }))
+  }
+
+  // Address management functions
+  const addAddress = () => {
+    const newAddress: Address = {
+      id: `addr_${Date.now()}`,
+      type: "Home",
+      name: `${userProfile.firstName} ${userProfile.lastName}`,
+      phone: userProfile.phone,
+      address: "",
+      city: "",
+      state: "",
+      pincode: "",
+      isDefault: addresses.length === 0,
+    }
+    const updatedAddresses = [...addresses, newAddress]
+    setAddresses(updatedAddresses)
+    localStorage.setItem("addresses", JSON.stringify(updatedAddresses))
+  }
+
+  const editAddress = (addressId: string, updates: Partial<Address>) => {
+    const updatedAddresses = addresses.map(addr => 
+      addr.id === addressId ? { ...addr, ...updates } : addr
+    )
+    setAddresses(updatedAddresses)
+    localStorage.setItem("addresses", JSON.stringify(updatedAddresses))
+  }
+
+  const deleteAddress = (addressId: string) => {
+    const updatedAddresses = addresses.filter(addr => addr.id !== addressId)
+    setAddresses(updatedAddresses)
+    localStorage.setItem("addresses", JSON.stringify(updatedAddresses))
+  }
+
+  const setDefaultAddress = (addressId: string) => {
+    const updatedAddresses = addresses.map(addr => ({
+      ...addr,
+      isDefault: addr.id === addressId
+    }))
+    setAddresses(updatedAddresses)
+    localStorage.setItem("addresses", JSON.stringify(updatedAddresses))
+  }
+
+  const startEditingAddress = (address: Address) => {
+    setEditingAddressId(address.id)
+    setEditingAddress({ ...address })
+  }
+
+  const saveEditingAddress = () => {
+    if (editingAddress && editingAddressId) {
+      editAddress(editingAddressId, editingAddress)
+      setEditingAddressId(null)
+      setEditingAddress(null)
+    }
+  }
+
+  const cancelEditingAddress = () => {
+    setEditingAddressId(null)
+    setEditingAddress(null)
+  }
+
+  const handleAddressInputChange = (field: keyof Address, value: string | boolean) => {
+    if (editingAddress) {
+      setEditingAddress({
+        ...editingAddress,
+        [field]: value
+      })
+    }
   }
 
   const getOrderItemsText = (order: Order) => {
@@ -407,7 +441,7 @@ export default function ProfilePage() {
                     <MapPin className="h-5 w-5 mr-2 text-blue-600" />
                     Saved Addresses
                   </span>
-                  <Button size="sm">
+                  <Button size="sm" onClick={addAddress}>
                     <Plus className="h-4 w-4 mr-2" />
                     Add New
                   </Button>
@@ -418,25 +452,115 @@ export default function ProfilePage() {
                   <div className="space-y-4">
                     {addresses.map((address) => (
                       <div key={address.id} className="border rounded-lg p-4">
-                        <div className="flex items-start justify-between">
-                          <div>
-                            <div className="flex items-center space-x-2 mb-2">
-                              <Badge className="mb-2">{address.type}</Badge>
-                              {address.isDefault && <Badge variant="outline">Default</Badge>}
+                        {editingAddressId === address.id ? (
+                          // Edit mode
+                          <div className="space-y-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div>
+                                <Label htmlFor={`name-${address.id}`}>Name</Label>
+                                <Input
+                                  id={`name-${address.id}`}
+                                  value={editingAddress?.name || ""}
+                                  onChange={(e) => handleAddressInputChange("name", e.target.value)}
+                                />
+                              </div>
+                              <div>
+                                <Label htmlFor={`phone-${address.id}`}>Phone</Label>
+                                <Input
+                                  id={`phone-${address.id}`}
+                                  value={editingAddress?.phone || ""}
+                                  onChange={(e) => handleAddressInputChange("phone", e.target.value)}
+                                />
+                              </div>
+                              <div className="md:col-span-2">
+                                <Label htmlFor={`address-${address.id}`}>Address</Label>
+                                <Input
+                                  id={`address-${address.id}`}
+                                  value={editingAddress?.address || ""}
+                                  onChange={(e) => handleAddressInputChange("address", e.target.value)}
+                                />
+                              </div>
+                              <div>
+                                <Label htmlFor={`city-${address.id}`}>City</Label>
+                                <Input
+                                  id={`city-${address.id}`}
+                                  value={editingAddress?.city || ""}
+                                  onChange={(e) => handleAddressInputChange("city", e.target.value)}
+                                />
+                              </div>
+                              <div>
+                                <Label htmlFor={`state-${address.id}`}>State</Label>
+                                <Input
+                                  id={`state-${address.id}`}
+                                  value={editingAddress?.state || ""}
+                                  onChange={(e) => handleAddressInputChange("state", e.target.value)}
+                                />
+                              </div>
+                              <div>
+                                <Label htmlFor={`pincode-${address.id}`}>Pincode</Label>
+                                <Input
+                                  id={`pincode-${address.id}`}
+                                  value={editingAddress?.pincode || ""}
+                                  onChange={(e) => handleAddressInputChange("pincode", e.target.value)}
+                                />
+                              </div>
+                              <div>
+                                <Label htmlFor={`type-${address.id}`}>Type</Label>
+                                <select
+                                  id={`type-${address.id}`}
+                                  value={editingAddress?.type || "Home"}
+                                  onChange={(e) => handleAddressInputChange("type", e.target.value)}
+                                  className="w-full p-2 border rounded"
+                                >
+                                  <option value="Home">Home</option>
+                                  <option value="Work">Work</option>
+                                  <option value="Other">Other</option>
+                                </select>
+                              </div>
                             </div>
-                            <h3 className="font-medium">{address.name}</h3>
-                            <p className="text-gray-600 text-sm">
-                              {address.address}
-                              <br />
-                              {address.city}, {address.state} {address.pincode}
-                              <br />
-                              {address.phone}
-                            </p>
+                            <div className="flex justify-end space-x-2">
+                              <Button size="sm" onClick={saveEditingAddress}>
+                                <Save className="h-4 w-4 mr-2" />
+                                Save
+                              </Button>
+                              <Button size="sm" variant="outline" onClick={cancelEditingAddress}>
+                                <X className="h-4 w-4 mr-2" />
+                                Cancel
+                              </Button>
+                            </div>
                           </div>
-                          <Button size="sm" variant="outline">
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                        </div>
+                        ) : (
+                          // View mode
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <div className="flex items-center space-x-2 mb-2">
+                                <Badge className="mb-2">{address.type}</Badge>
+                                {address.isDefault && <Badge variant="outline">Default</Badge>}
+                              </div>
+                              <h3 className="font-medium">{address.name}</h3>
+                              <p className="text-gray-600 text-sm">
+                                {address.address}
+                                <br />
+                                {address.city}, {address.state} {address.pincode}
+                                <br />
+                                {address.phone}
+                              </p>
+                            </div>
+                            <div className="flex space-x-2">
+                              <Button size="sm" variant="outline" onClick={() => startEditingAddress(address)}>
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              <Button size="sm" variant="outline" onClick={() => deleteAddress(address.id)}>
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                              {!address.isDefault && (
+                                <Button size="sm" variant="outline" onClick={() => setDefaultAddress(address.id)}>
+                                  Set Default
+                                </Button>
+                              )}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -444,7 +568,7 @@ export default function ProfilePage() {
                   <div className="text-center py-8">
                     <MapPin className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                     <p className="text-gray-500 mb-4">No addresses saved</p>
-                    <Button>
+                    <Button onClick={addAddress}>
                       <Plus className="h-4 w-4 mr-2" />
                       Add Address
                     </Button>

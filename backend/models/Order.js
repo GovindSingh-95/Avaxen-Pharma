@@ -43,6 +43,20 @@ const orderSchema = new mongoose.Schema({
   // Shipping
   shippingAddress: shippingAddressSchema,
   
+  // Delivery Agent
+  deliveryAgent: {
+    id: { type: mongoose.Schema.Types.ObjectId, ref: 'DeliveryAgent' },
+    name: { type: String },
+    phone: { type: String },
+    vehicle: {
+      type: { type: String },
+      number: { type: String },
+      model: { type: String }
+    },
+    assignedAt: { type: Date },
+    estimatedDelivery: { type: Date }
+  },
+  
   // Order status
   status: {
     type: String,
@@ -74,14 +88,6 @@ const orderSchema = new mongoose.Schema({
   // Delivery
   estimatedDelivery: Date,
   deliveredAt: Date,
-  
-  // Delivery Agent Information
-  deliveryAgent: {
-    name: String,
-    phone: String,
-    vehicle: String,
-    assignedAt: Date
-  },
   
   // Pharmacy Information
   pharmacyDetails: {

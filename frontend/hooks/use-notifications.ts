@@ -101,7 +101,7 @@ export function useNotifications(): NotificationHook {
                 <div style="background: #f9fafb; border-radius: 8px; padding: 15px;">
                   <p style="margin: 5px 0;"><strong>Name:</strong> ${data.deliveryAgent?.name || 'Professional Agent'}</p>
                   <p style="margin: 5px 0;"><strong>Vehicle:</strong> ${data.deliveryAgent?.vehicle || 'Delivery Vehicle'}</p>
-                  <p style="margin: 5px 0;"><strong>Contact:</strong> ${data.deliveryAgent?.phone || '+91 98765 43210'}</p>
+                  <p style="margin: 5px 0;"><strong>Contact:</strong> ${data.deliveryAgent?.phone || '+91 9999999999'}</p>
                   <p style="margin: 5px 0;"><strong>ETA:</strong> ${data.estimatedTime || '20-30 minutes'}</p>
                 </div>
               </div>

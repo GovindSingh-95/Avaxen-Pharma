@@ -83,59 +83,8 @@ export function useUserProfile() {
           }
         });
       } else {
-        // Create default profile for demo
-        const defaultProfile: UserProfile = {
-          id: 'user_' + Date.now(),
-          name: 'John Doe',
-          email: 'john.doe@example.com',
-          phone: '+91 98765 43210',
-          address: {
-            street: '123 Health Street',
-            city: 'Mumbai',
-            state: 'Maharashtra',
-            zipCode: '400001',
-            coordinates: { lat: 19.0760, lng: 72.8777 }
-          },
-          medicalProfile: {
-            allergies: ['Penicillin', 'Shellfish'],
-            chronicConditions: ['Hypertension'],
-            currentMedications: ['Amlodipine 5mg'],
-            emergencyContact: {
-              name: 'Jane Doe',
-              phone: '+91 98765 43211',
-              relationship: 'Spouse'
-            },
-            bloodGroup: 'O+',
-            dateOfBirth: '1985-06-15',
-            height: 175,
-            weight: 70,
-            insuranceProvider: 'Health Insurance Co.',
-            insuranceNumber: 'HIC123456789'
-          },
-          preferences: {
-            emailNotifications: true,
-            smsNotifications: true,
-            reminderTime: '09:00',
-            languagePreference: 'en'
-          },
-          accountSecurity: {
-            twoFactorEnabled: false,
-            lastLoginAt: new Date(),
-            loginAttempts: 0,
-            securityQuestions: [
-              {
-                question: 'What is your mother\'s maiden name?',
-                answer: 'Smith' // In production, this would be hashed
-              }
-            ]
-          },
-          role: 'customer',
-          createdAt: new Date(),
-          updatedAt: new Date()
-        };
-        
-        setProfile(defaultProfile);
-        localStorage.setItem('userProfile', JSON.stringify(defaultProfile));
+        // Don't create default profile - let user profile be empty until they fill it
+        setProfile(null);
       }
     } catch (err) {
       setError('Failed to load user profile');
