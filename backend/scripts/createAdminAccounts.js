@@ -1,4 +1,6 @@
+require('dotenv').config({ path: require('path').join(__dirname, '../.env') });
 const User = require('../models/User')
+const mongoose = require('mongoose');
 
 // Admin seeding script for Avaxan Pharmacy
 const createAdminAccounts = async () => {
@@ -51,4 +53,13 @@ const createAdminAccounts = async () => {
   }
 }
 
-module.exports = { createAdminAccounts }
+console.log("Connecting to:", process.env.MONGODB_URI);
+mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => {
+    console.log('Connected to MongoDB!');
+    createAdminAccounts();
+  })
+  .catch(err => {
+    console.error('MongoDB connection error:', err);
+  });
+
