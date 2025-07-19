@@ -3,6 +3,36 @@ import { Medicine } from './medicine-api';
 
 // Admin API functions
 export const adminApi = {
+  // Admin authentication
+  auth: {
+    // Admin login
+    login: async (email: string, password: string): Promise<{
+      success: boolean;
+      user: any;
+      token: string;
+      message: string;
+    }> => {
+      return apiClient.post('/api/auth/admin/login', { email, password });
+    },
+
+    // Verify admin token
+    verifyToken: async (): Promise<{
+      success: boolean;
+      user: any;
+      message: string;
+    }> => {
+      return apiClient.get('/api/auth/admin/verify');
+    },
+
+    // Get admin stats
+    getStats: async (): Promise<{
+      success: boolean;
+      stats: any;
+      message: string;
+    }> => {
+      return apiClient.get('/api/auth/admin/stats');
+    },
+  },
   // Medicine management
   medicines: {
     // Upload medicine image
@@ -97,12 +127,20 @@ export const adminApi = {
     },
 
     // Update medicine
-    update: async (medicineId: string, data: Partial<Medicine>): Promise<{
+    update: async (medicineId: string, formData: FormData): Promise<{
       success: boolean;
       medicine: Medicine;
       message: string;
     }> => {
-      return apiClient.put(`/api/admin/medicines/${medicineId}`, data);
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+
+      return apiClient.request(`/api/admin/medicines/${medicineId}`, {
+        method: 'PUT',
+        headers: {
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+        body: formData,
+      });
     },
 
     // Delete medicine
@@ -122,6 +160,63 @@ export const adminApi = {
       return apiClient.put(`/api/admin/medicines/${medicineId}/image`, {
         imageUrl,
       });
+    },
+
+    // Create new medicine
+    create: async (formData: FormData): Promise<{
+      success: boolean;
+      medicine: Medicine;
+      message: string;
+    }> => {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+
+      return apiClient.request('/api/admin/medicines', {
+        method: 'POST',
+        headers: {
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+        body: formData,
+      });
+    },
+
+    // Update medicine quantity
+    updateQuantity: async (medicineId: string, quantity: number): Promise<{
+      success: boolean;
+      medicine: Medicine;
+      message: string;
+    }> => {
+      return apiClient.put(`/api/admin/medicines/${medicineId}/quantity`, {
+        quantity,
+      });
+    },
+
+    // Bulk update quantities
+    bulkUpdateQuantities: async (updates: Array<{ medicineId: string; quantity: number }>): Promise<{
+      success: boolean;
+      message: string;
+      results: Array<{ medicineId: string; success: boolean; message: string }>;
+    }> => {
+      return apiClient.put('/api/admin/medicines/bulk-update-quantities', {
+        updates,
+      });
+    },
+
+    // Get low stock medicines
+    getLowStock: async (): Promise<{
+      success: boolean;
+      medicines: Medicine[];
+      message: string;
+    }> => {
+      return apiClient.get('/api/admin/medicines/low-stock');
+    },
+
+    // Get out of stock medicines
+    getOutOfStock: async (): Promise<{
+      success: boolean;
+      medicines: Medicine[];
+      message: string;
+    }> => {
+      return apiClient.get('/api/admin/medicines/out-of-stock');
     },
   },
 };

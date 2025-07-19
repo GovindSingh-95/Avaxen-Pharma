@@ -2,6 +2,9 @@ const express = require('express');
 const { 
   register, 
   loginUser, 
+  adminLogin,
+  verifyAdminToken,
+  getAdminStats,
   getProfile, 
   updateProfile,
   addAddress,
@@ -17,9 +20,12 @@ const router = express.Router();
 // Public routes
 router.post('/register', register);
 router.post('/login', loginUser);
+router.post('/admin/login', adminLogin);
 
 // Protected routes
 router.get('/profile', protect, getProfile);
+router.get('/admin/verify', protect, verifyAdminToken);
+router.get('/admin/stats', protect, getAdminStats);
 router.put('/profile', protect, updateProfile);
 router.post('/address', protect, addAddress);
 router.put('/address/:addressId', protect, updateAddress);

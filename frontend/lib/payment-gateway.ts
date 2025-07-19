@@ -95,7 +95,7 @@ export class RazorpayGateway {
           currency: details.currency,
           name: "Avaxen Pharma",
           description: "Medicine Order Payment",
-          image: "/placeholder-logo.png",
+          image: "/avaxan-logo.png",
           order_id: details.orderId,
           handler: function (response: any) {
             resolve({

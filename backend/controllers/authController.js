@@ -163,6 +163,211 @@ const loginUser = async (req, res) => {
   }
 };
 
+// Admin Login - Secure admin authentication - ONLY AUTHORIZED CREDENTIALS
+const adminLogin = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // Validation
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide email and password'
+      });
+    }
+
+    // STRICT CREDENTIAL CHECK - Only allow specific admin credentials
+    const authorizedEmail = 'Avaxanpharmaceuticals@gmail.com';
+    const authorizedPassword = 'brijesh@28_1974';
+
+    if (email !== authorizedEmail || password !== authorizedPassword) {
+      return res.status(401).json({
+        success: false,
+        message: 'Access denied. Invalid admin credentials.'
+      });
+    }
+
+    // Find user and include password for comparison
+    const user = await User.findOne({ email }).select('+password');
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid admin credentials'
+      });
+    }
+
+    // Check if user has admin role
+    if (!['admin', 'owner', 'pharmacist', 'inventory', 'support', 'finance'].includes(user.role)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied. Admin privileges required.'
+      });
+    }
+
+    // Check password
+    const isPasswordValid = await user.comparePassword(password);
+    if (!isPasswordValid) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid admin credentials'
+      });
+    }
+
+    // Check if admin account is active
+    if (!user.isActive) {
+      return res.status(403).json({
+        success: false,
+        message: 'Admin account is deactivated. Contact system administrator.'
+      });
+    }
+
+    // Update last login
+    user.lastLogin = new Date();
+    await user.save();
+
+    // Generate admin token with extended expiry
+    const adminToken = jwt.sign(
+      {
+        userId: user._id,
+        email: user.email,
+        role: user.role,
+        permissions: user.permissions,
+        platform: 'avaxan-admin',
+        issued: Date.now(),
+        version: '2.0'
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: '24h', // Admin tokens expire in 24 hours
+        issuer: 'avaxan-pharmacy',
+        audience: 'avaxan-admin'
+      }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: 'Admin login successful',
+      user: {
+        id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+        permissions: user.permissions,
+        department: user.department,
+        lastLogin: user.lastLogin
+      },
+      token: adminToken,
+      isAdmin: true
+    });
+  } catch (error) {
+    console.error('Admin login error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Admin login failed',
+      error: error.message
+    });
+  }
+};
+
+// Verify admin token
+const verifyAdminToken = async (req, res) => {
+  try {
+    const token = req.headers.authorization?.replace('Bearer ', '');
+    
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        message: 'No token provided'
+      });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    
+    // Check if it's an admin token
+    if (decoded.audience !== 'avaxan-admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Invalid admin token'
+      });
+    }
+
+    const user = await User.findById(decoded.userId);
+    if (!user || !['admin', 'owner', 'pharmacist', 'inventory', 'support', 'finance'].includes(user.role)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Admin access required'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Admin token valid',
+      user: {
+        id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+        permissions: user.permissions,
+        department: user.department
+      }
+    });
+  } catch (error) {
+    res.status(401).json({
+      success: false,
+      message: 'Invalid or expired token'
+    });
+  }
+};
+
+// Get admin dashboard stats
+const getAdminStats = async (req, res) => {
+  try {
+    // Only allow admin users
+    if (!['admin', 'owner', 'pharmacist', 'inventory', 'support', 'finance'].includes(req.user.role)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Admin access required'
+      });
+    }
+
+    // Get basic stats
+    const totalUsers = await User.countDocuments({ role: 'user' });
+    const totalMedicines = await Medicine.countDocuments();
+    
+    // Get low stock medicines
+    const lowStockMedicines = await Medicine.find({
+      $expr: {
+        $lte: ['$quantity', { $ifNull: ['$minQuantity', 10] }]
+      }
+    }).countDocuments();
+
+    // Get out of stock medicines
+    const outOfStockMedicines = await Medicine.find({ quantity: 0 }).countDocuments();
+
+    res.status(200).json({
+      success: true,
+      stats: {
+        totalUsers,
+        totalMedicines,
+        lowStockMedicines,
+        outOfStockMedicines,
+        pendingOrders: 0, // TODO: Add order model
+        totalRevenue: 0 // TODO: Add order model
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to get admin stats',
+      error: error.message
+    });
+  }
+};
+
 // Get User Profile
 const getProfile = async (req, res) => {
   try {
@@ -376,6 +581,9 @@ const getWishlist = async (req, res) => {
 module.exports = {
   register,
   loginUser,
+  adminLogin,
+  verifyAdminToken,
+  getAdminStats,
   getProfile,
   updateProfile,
   addAddress,

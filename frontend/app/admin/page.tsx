@@ -43,6 +43,7 @@ export default function AdminDashboard() {
     pendingOrders: 0,
     lowStockItems: 0
   })
+  const [lowStockCount, setLowStockCount] = useState(0)
 
   useEffect(() => {
     // Check if user is admin
@@ -66,6 +67,16 @@ export default function AdminDashboard() {
         pendingOrders: 23,
         lowStockItems: 8
       })
+
+      // Fetch low stock count
+      try {
+        const response = await adminApi.medicines.getLowStock()
+        if (response.success) {
+          setLowStockCount(response.medicines.length)
+        }
+      } catch (error) {
+        console.error('Failed to fetch low stock count:', error)
+      }
     } catch (error) {
       console.error('Failed to fetch admin stats:', error)
     }
@@ -181,6 +192,12 @@ export default function AdminDashboard() {
                     <Link href="/admin/medicines/add">
                       <Plus className="h-4 w-4 mr-2" />
                       Add New Medicine
+                    </Link>
+                  </Button>
+                  <Button variant="outline" className="w-full justify-start" asChild>
+                    <Link href="/admin/medicines/inventory">
+                      <Package className="h-4 w-4 mr-2" />
+                      Manage Inventory ({lowStockCount} low stock)
                     </Link>
                   </Button>
                   <Button variant="outline" className="w-full justify-start" asChild>

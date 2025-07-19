@@ -10,11 +10,16 @@ import { Toaster } from "@/components/ui/toaster"
 const fontClass = "font-sans"
 
 export const metadata: Metadata = {
-  title: "Avaxan - Your Trusted Online Pharmacy",
+  title: "Avaxan - Your wellbeing is our happiness",
   description:
-    "Get genuine medicines delivered to your doorstep. Fast, reliable, and affordable healthcare solutions from Avaxan - your trusted online pharmacy.",
+    "Your wellbeing is our happiness. Get genuine medicines delivered to your doorstep. Fast, reliable, and affordable healthcare solutions from Avaxan.",
   keywords: "online pharmacy, medicines, healthcare, prescription drugs, health products, medical supplies",
-    generator: 'v0.dev'
+  generator: 'v0.dev',
+  icons: {
+    icon: '/avaxan-logo.ico',
+    shortcut: '/avaxan-logo.ico',
+    apple: '/avaxan-logo.ico',
+  },
 }
 
 export default function RootLayout({

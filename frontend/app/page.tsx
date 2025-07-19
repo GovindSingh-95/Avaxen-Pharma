@@ -182,7 +182,7 @@ export default function HomePage() {
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center space-x-2">
               <img 
-                src="/axaxan-logo.svg" 
+                src="/avaxan-logo.svg" 
                 alt="Avaxan Logo" 
                 className="h-8 w-8"
               />
@@ -240,7 +240,7 @@ export default function HomePage() {
       {/* Hero Section */}
       <section className="py-16 px-4">
         <div className="container mx-auto max-w-4xl text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">Your Health, Delivered</h1>
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">Your wellbeing is our happiness</h1>
           <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
             Order genuine medicines online with free delivery. Trusted by thousands of families across India.
           </p>
@@ -467,13 +467,13 @@ export default function HomePage() {
             <div>
               <Link href="/" className="flex items-center space-x-2 mb-4">
                 <img 
-                  src="/axaxan-logo.svg" 
+                  src="/avaxan-logo.svg" 
                   alt="Avaxan Logo" 
                   className="h-8 w-8"
                 />
                 <span className="text-xl font-bold">Avaxan</span>
               </Link>
-              <p className="text-gray-400">Your trusted online pharmacy for genuine medicines and healthcare.</p>
+              <p className="text-gray-400">Your wellbeing is our happiness - trusted online pharmacy for genuine medicines and healthcare.</p>
             </div>
 
             <div>

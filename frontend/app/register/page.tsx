@@ -90,9 +90,9 @@ export default function RegisterPage() {
         <Card className="border-0 shadow-xl">
           <CardHeader className="text-center pb-6">
             <div className="flex items-center justify-center mb-4">
-              <img 
-                src="/axaxan-logo.svg" 
-                alt="Avaxan Logo" 
+                            <img
+                src="/avaxan-logo.svg"
+                alt="Avaxan Logo"
                 className="h-12 w-12"
               />
               <span className="text-2xl font-bold text-gray-900 ml-3">Avaxan</span>

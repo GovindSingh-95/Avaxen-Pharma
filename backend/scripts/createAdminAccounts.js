@@ -10,52 +10,16 @@ const createAdminAccounts = async () => {
       return
     }
 
-    // Create admin accounts for Avaxan team
+    // Create admin account for Avaxan - ONLY ONE AUTHORIZED ADMIN
     const adminAccounts = [
       {
-        name: 'Avaxan Owner',
-        email: 'owner@avaxan.com',
-        password: 'AvaxanOwner2025!',
-        role: 'owner',
-        permissions: ['all'],
-        department: 'Management',
+        name: 'Avaxan Pharmaceuticals Admin',
+        email: 'Avaxanpharmaceuticals@gmail.com',
+        password: 'brijesh@28_1974',
+        role: 'admin',
+        permissions: ['manage_medicines', 'manage_orders', 'manage_users', 'view_analytics'],
+        department: 'Administration',
         phone: '+91 9876543210'
-      },
-      {
-        name: 'Head Pharmacist',
-        email: 'pharmacist@avaxan.com', 
-        password: 'AvaxanPharmacist2025!',
-        role: 'pharmacist',
-        permissions: ['medicines', 'prescriptions', 'orders'],
-        department: 'Pharmacy',
-        phone: '+91 9876543211'
-      },
-      {
-        name: 'Inventory Manager',
-        email: 'inventory@avaxan.com',
-        password: 'AvaxanInventory2025!',
-        role: 'inventory',
-        permissions: ['medicines', 'stock', 'suppliers'],
-        department: 'Inventory',
-        phone: '+91 9876543212'
-      },
-      {
-        name: 'Customer Support',
-        email: 'support@avaxan.com',
-        password: 'AvaxanSupport2025!',
-        role: 'support',
-        permissions: ['orders', 'users', 'support'],
-        department: 'Customer Service',
-        phone: '+91 9876543213'
-      },
-      {
-        name: 'Finance Manager',
-        email: 'finance@avaxan.com',
-        password: 'AvaxanFinance2025!',
-        role: 'finance',
-        permissions: ['orders', 'payments', 'reports'],
-        department: 'Finance',
-        phone: '+91 9876543214'
       }
     ]
 

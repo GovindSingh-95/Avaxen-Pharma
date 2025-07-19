@@ -11,6 +11,7 @@ import { useAuth } from "@/contexts/AuthContext"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Eye, EyeOff, Mail, Lock, ArrowLeft, Shield, Users, Package, Headphones, TrendingUp } from "lucide-react"
+import { adminApi } from "@/lib/api"
 
 export default function AdminLoginPage() {
   const [formData, setFormData] = useState({
@@ -25,43 +26,31 @@ export default function AdminLoginPage() {
   const { login, user } = useAuth()
   const router = useRouter()
 
-  // Handle redirect after successful login and user context update
+  // Handle redirect after successful admin login
   useEffect(() => {
-    if (loginSuccess && user) {
-      if (['admin', 'pharmacist'].includes(user.role)) {
-        router.push("/admin")
-      } else {
-        setError("Access denied. Admin privileges required.")
-        setLoginSuccess(false)
-        setLoading(false)
+    if (loginSuccess) {
+      const adminUser = localStorage.getItem('adminUser')
+      if (adminUser) {
+        const userData = JSON.parse(adminUser)
+        if (['admin', 'owner', 'pharmacist', 'inventory', 'support', 'finance'].includes(userData.role)) {
+          router.push("/admin")
+        } else {
+          setError("Access denied. Admin privileges required.")
+          setLoginSuccess(false)
+          setLoading(false)
+        }
       }
     }
-  }, [loginSuccess, user, router])
+  }, [loginSuccess, router])
 
   const adminAccounts = [
     {
-      role: "Owner/Manager",
-      email: "admin@avaxen.com",
-      password: "admin123",
+      role: "Avaxan Pharmaceuticals Admin",
+      email: "Avaxanpharmaceuticals@gmail.com",
+      password: "brijesh@28_1974",
       icon: <Shield className="h-5 w-5" />,
-      color: "bg-purple-100 text-purple-800 border-purple-200",
-      permissions: "Full System Access"
-    },
-    {
-      role: "Head Pharmacist", 
-      email: "pharmacist@avaxen.com",
-      password: "pharma123",
-      icon: <Users className="h-5 w-5" />,
-      color: "bg-green-100 text-green-800 border-green-200",
-      permissions: "Medicines, Prescriptions, Orders"
-    },
-    {
-      role: "Demo Admin",
-      email: "demo@avaxen.com", 
-      password: "demo123",
-      icon: <Package className="h-5 w-5" />,
       color: "bg-blue-100 text-blue-800 border-blue-200",
-      permissions: "Demo Access - All Features"
+      permissions: "Full Admin Access - Medicines, Orders, Users, Analytics"
     }
   ]
 
@@ -88,13 +77,18 @@ export default function AdminLoginPage() {
     }
 
     try {
-      const result = await login(formData.email, formData.password)
+      // Use admin login API instead of regular login
+      const result = await adminApi.auth.login(formData.email, formData.password)
       
       if (result.success) {
+        // Store admin token
+        localStorage.setItem('adminToken', result.token)
+        localStorage.setItem('adminUser', JSON.stringify(result.user))
+        
         // Set login success flag to trigger useEffect for redirect
         setLoginSuccess(true)
       } else {
-        setError(result.message || "Login failed")
+        setError(result.message || "Admin login failed")
         setLoading(false)
       }
     } catch (err) {
@@ -111,7 +105,7 @@ export default function AdminLoginPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <img 
-                src="/axaxan-logo.svg" 
+                src="/avaxan-logo.svg" 
                 alt="Avaxan Logo" 
                 className="h-8 w-8"
               />
