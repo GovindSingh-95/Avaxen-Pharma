@@ -56,6 +56,7 @@ const corsOptions = {
   origin: function (origin, callback) {
     const allowedOrigins = [
       'https://avaxan-pharma.vercel.app',
+      'https://avaxan-pharma-hg0otc0mw-govinds9551-gmailcoms-projects.vercel.app',
       'http://localhost:3000',
       'http://localhost:3001',
       'http://localhost:3002',
