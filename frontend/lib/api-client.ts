@@ -25,9 +25,12 @@ export class ApiClient {
     // Get token from localStorage if available
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
     
+    // Don't set Content-Type for FormData (let browser set it with boundary)
+    const isFormData = options.body instanceof FormData;
+    
     const config: RequestInit = {
       headers: {
-        'Content-Type': 'application/json',
+        ...(!isFormData && { 'Content-Type': 'application/json' }),
         ...(token && { Authorization: `Bearer ${token}` }),
         ...options.headers,
       },

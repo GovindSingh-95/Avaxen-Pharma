@@ -206,25 +206,5 @@ export const orderApi = {
     return apiClient.post('/api/orders/payment/verify', paymentData);
   },
 
-  // Upload prescription for order
-  uploadPrescription: async (orderId: string, prescriptionFiles: File[]): Promise<{ 
-    success: boolean; 
-    order: Order; 
-    message: string 
-  }> => {
-    const formData = new FormData();
-    prescriptionFiles.forEach((file, index) => {
-      formData.append(`prescription${index}`, file);
-    });
 
-    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-
-    return apiClient.request(`/api/orders/${orderId}/prescription`, {
-      method: 'POST',
-      headers: {
-        ...(token && { Authorization: `Bearer ${token}` }),
-      },
-      body: formData,
-    });
-  },
 };
