@@ -30,8 +30,8 @@ export const prescriptionApi = {
   // Upload prescription
   uploadPrescription: async (prescriptionFiles: File[]): Promise<UploadPrescriptionResponse> => {
     const formData = new FormData();
-    prescriptionFiles.forEach((file, index) => {
-      formData.append(`prescription${index}`, file);
+    prescriptionFiles.forEach((file) => {
+      formData.append('images', file);
     });
 
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
